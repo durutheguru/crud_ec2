@@ -6,7 +6,7 @@ yum -y install telnet
 
 yum install -y java-17-openjdk
 
-aws s3 cp "s3://crud_ec2_00001/crud_ec2-0.0.1-SNAPSHOT.jar" /home/crud_ec2-0.0.1-SNAPSHOT.jar
+aws s3 cp "s3://crud-ec2-00001/crud_ec2-0.0.1-SNAPSHOT.jar" /home/crud_ec2-0.0.1-SNAPSHOT.jar
 
 cat << EOF > /etc/systemd/system/ec2_crud.service
 
