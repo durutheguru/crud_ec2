@@ -7,17 +7,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.amazon.awscdk.Stage;
 import software.amazon.awscdk.StageProps;
+import software.amazon.awscdk.services.s3.Bucket;
 import software.constructs.Construct;
 
 /**
  * created by Julian Dumebi Duru on 19/07/2023
  */
 public class TestStage extends Stage {
-
-
-    public TestStage(@NotNull Construct scope, @NotNull String id) {
-        this(scope, id, null);
-    }
 
 
     public TestStage(@NotNull Construct scope, @NotNull String id, @Nullable StageProps props) {

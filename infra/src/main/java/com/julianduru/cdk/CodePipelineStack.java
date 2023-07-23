@@ -8,6 +8,7 @@ import software.amazon.awscdk.StageProps;
 import software.amazon.awscdk.pipelines.CodePipeline;
 import software.amazon.awscdk.pipelines.CodePipelineSource;
 import software.amazon.awscdk.pipelines.ShellStep;
+import software.amazon.awscdk.services.s3.Bucket;
 import software.constructs.Construct;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+
 
 public class CodePipelineStack extends Stack {
 
@@ -29,6 +31,19 @@ public class CodePipelineStack extends Stack {
     public CodePipelineStack(final Construct scope, final String id, final StackProps props) {
         super(scope, id, props);
 
+        Bucket bucket = this.createDeploymentBucket();
+        createCodePipeline(bucket);
+    }
+
+
+    private Bucket createDeploymentBucket() {
+        return Bucket.Builder.create(this, "EC2DeploymentBucket")
+            .bucketName("crud-ec2-00001")
+            .build();
+    }
+
+
+    private void createCodePipeline(Bucket bucket) {
         CodePipeline pipeline = CodePipeline.Builder.create(this, "pipeline")
             .pipelineName("Pipeline")
             .synth(
@@ -80,5 +95,6 @@ public class CodePipelineStack extends Stack {
 
 
 }
+
 
 
