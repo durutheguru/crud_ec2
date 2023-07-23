@@ -4,7 +4,7 @@
 yum update -y
 yum -y install telnet
 
-yum install -y java-17-openjdk
+yum install -y java-17-amazon-corretto.x86_64
 
 aws s3 cp "s3://crud-ec2-00001/crud_ec2-0.0.1-SNAPSHOT.jar" /home/crud_ec2-0.0.1-SNAPSHOT.jar
 
