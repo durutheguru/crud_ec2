@@ -65,6 +65,7 @@ public class VpcStack extends Stack {
             .vpc(vpc)
             .build();
         sg.addIngressRule(Peer.anyIpv4(), Port.tcp(22), "Allow SSH access");
+        sg.addIngressRule(Peer.anyIpv4(), Port.tcp(8080), "Allow Service Port access");
 
         return sg;
     }
