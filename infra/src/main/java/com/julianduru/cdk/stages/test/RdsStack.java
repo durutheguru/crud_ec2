@@ -17,19 +17,36 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class RdsStack extends Stack {
+
+    private final DatabaseInstance database;
+
+    private final Secret secret;
+
+    private final Map<String, String> databaseEnvMap;
 
 
     public RdsStack(final Construct scope, final String id, final Vpc vpc, final SecurityGroup ec2SecurityGroup) {
         super(scope, id);
 
+        this.secret = createDatabaseSecret();
+        this.database = createDatabaseInstance(vpc, this.secret, ec2SecurityGroup);
+
+        this.databaseEnvMap = prepareDbEnvMap();
+
+        // Output RDS Endpoint
+        CfnOutput.Builder.create(this, "DatabaseEndpoint")
+            .value(database.getDbInstanceEndpointAddress())
+            .build();
+    }
+
+
+    private Secret createDatabaseSecret() {
         Map<String, String> secretsMap = new HashMap<>();
         secretsMap.put("username", "duru");
 
-
-        // Create RDS Database Secret
-        // Templated secret with username and password fields
-        Secret secret = Secret.Builder.create(this, "TemplatedSecret")
+        return Secret.Builder.create(this, "TemplatedSecret")
             .generateSecretString(
                 SecretStringGenerator.builder()
                     .secretStringTemplate(JSONUtil.asJsonString(secretsMap, ""))
@@ -38,9 +55,10 @@ public class RdsStack extends Stack {
                     .build()
             )
             .build();
+    }
 
 
-        // Create Security Group
+    private DatabaseInstance createDatabaseInstance(Vpc vpc, Secret secret, SecurityGroup ec2SecurityGroup) {
         SecurityGroup rdsSecurityGroup = SecurityGroup.Builder.create(this, "TestRDSSecurityGroup")
             .vpc(vpc)
             .build();
@@ -48,8 +66,7 @@ public class RdsStack extends Stack {
         rdsSecurityGroup.addIngressRule(Peer.anyIpv4(), Port.tcp(3306), "Allow Public access");
 
 
-        // Create RDS Database Instance
-        DatabaseInstance database = DatabaseInstance.Builder.create(this, "Database")
+        return DatabaseInstance.Builder.create(this, "Database")
             .engine(
                 DatabaseInstanceEngine.mysql(
                     MySqlInstanceEngineProps.builder()
@@ -67,12 +84,35 @@ public class RdsStack extends Stack {
             )
             .securityGroups(Collections.singletonList(rdsSecurityGroup))
             .build();
+    }
 
 
-        // Output RDS Endpoint
-        CfnOutput.Builder.create(this, "DatabaseEndpoint")
-            .value(database.getDbInstanceEndpointAddress())
-            .build();
+    public DatabaseInstance getDatabase() {
+        return database;
+    }
+
+
+    public Secret getSecret() {
+        return secret;
+    }
+
+
+    private Map<String, String> prepareDbEnvMap() {
+        Map<String, String> map = new HashMap<>();
+
+        map.put("DB_ENDPOINT", database.getDbInstanceEndpointAddress());
+        map.put("DB_NAME", "ec2_db");
+        map.put("SECRET_NAME", this.secret.getSecretName());
+        map.put("SECRET_ARN", this.secret.getSecretArn());
+
+        System.out.println("DBMap: \n" + map);
+
+        return map;
+    }
+
+
+    public Map<String, String> getDatabaseEnvMap() {
+        return databaseEnvMap;
     }
 
 

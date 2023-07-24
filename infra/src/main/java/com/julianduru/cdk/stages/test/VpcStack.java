@@ -6,10 +6,7 @@ package com.julianduru.cdk.stages.test;
 
 import software.amazon.awscdk.CfnOutput;
 import software.amazon.awscdk.Stack;
-import software.amazon.awscdk.services.ec2.IpAddresses;
-import software.amazon.awscdk.services.ec2.SubnetConfiguration;
-import software.amazon.awscdk.services.ec2.SubnetType;
-import software.amazon.awscdk.services.ec2.Vpc;
+import software.amazon.awscdk.services.ec2.*;
 import software.constructs.Construct;
 
 import java.util.Arrays;
@@ -18,6 +15,9 @@ public class VpcStack extends Stack {
 
 
     private final Vpc vpc;
+
+
+    private final SecurityGroup ec2SecurityGroup;
 
 
     public VpcStack(final Construct scope, final String id) {
@@ -46,6 +46,8 @@ public class VpcStack extends Stack {
             )
             .build();
 
+        this.ec2SecurityGroup = this.createSecurityGroup(this.vpc);
+
         // Output VPC ID
         CfnOutput.Builder.create(this, "Test_Env_Vpc_Id")
             .value(vpc.getVpcId())
@@ -58,4 +60,21 @@ public class VpcStack extends Stack {
     }
 
 
+    private SecurityGroup createSecurityGroup(Vpc vpc) {
+        SecurityGroup sg = SecurityGroup.Builder.create(this, "TestEc2SecurityGroup")
+            .vpc(vpc)
+            .build();
+        sg.addIngressRule(Peer.anyIpv4(), Port.tcp(22), "Allow SSH access");
+
+        return sg;
+    }
+
+
+    public SecurityGroup getEc2SecurityGroup() {
+        return ec2SecurityGroup;
+    }
+
+
 }
+
+
