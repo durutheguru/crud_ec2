@@ -17,6 +17,8 @@ SECRET_NAME=%s
 USERNAME=$(aws secretsmanager get-secret-value --secret-id ${SECRET_NAME} --query SecretString --output text | jq -r .username)
 PASSWORD=$(aws secretsmanager get-secret-value --secret-id ${SECRET_NAME} --query SecretString --output text | jq -r .password)
 
+echo "user: ${USERNAME}, password: ${PASSWORD}"
+
 cat << EOF > /etc/systemd/system/ec2_crud.service
 
 [Unit]
