@@ -1,5 +1,6 @@
 #!/bin/bash
 
+echo "Deployment Time: %s"
 
 yum update -y
 yum -y install telnet

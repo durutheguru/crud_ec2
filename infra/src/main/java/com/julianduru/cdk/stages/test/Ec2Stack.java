@@ -17,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class Ec2Stack extends Stack {
 
         String scriptContent = String.format(
             readBootStrapScript(),
+            LocalDateTime.now(),
             databaseEnvMap.get("DB_ENDPOINT"),
             databaseEnvMap.get("DB_NAME"),
             databaseEnvMap.get("SECRET_NAME")
@@ -68,6 +70,7 @@ public class Ec2Stack extends Stack {
             .machineImage(MachineImage.latestAmazonLinux2023())
             .securityGroup(securityGroup)
             .userData(UserData.custom(scriptContent))
+            .userDataCausesReplacement(true)
             .role(role)
             .build();
     }
@@ -127,6 +130,5 @@ public class Ec2Stack extends Stack {
 
 
 }
-
 
 
